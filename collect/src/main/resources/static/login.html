@@ -1,0 +1,159 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width" />
+    <title>数据采集管理系统登录</title>
+    <link href="./css/bootstrap.css" rel="stylesheet" />
+    <link href="./css/theme.css" rel="stylesheet" />
+    <script src="./js/jquery-1.8.2.min.js"></script>
+    <script src="./js/jquery-1.8.2.js"></script>
+    <script src="./js/base64.js"></script>
+    <style>
+        .div {
+            width: 100%;
+            margin: 40px auto;
+            border: 1px solid #999;
+            padding: 0 20px;
+            border-radius: 10px;
+        }
+
+        #log {
+            width: 100%;
+            margin: 0;
+            padding: 0.5em 0;
+            -webkit-border-radius: 0.3em;
+            -moz-border-radius: 0.3em;
+            border: #1263be solid 1px;
+            background: rgb(16,66,101);
+            color: #FFF;
+            font-size: 17px;
+            font-weight: bolder;
+            letter-spacing: 1em;
+        }
+
+            #log :hover {
+                background: #1263be;
+            }
+    </style>
+</head>
+<body>
+<div style="background-color:rgb(16,66,101); width:100%; height:80px;">
+    <div class="navbar-header">
+        <a class="">
+                <span class="navbar-brand" style="color:White; font-size:23px">
+                    <span style="color:White;margin-left:80px"><img style="width:100px;" src="./img/LOGOwh.png" /></span>&nbsp;&nbsp; 人和致远全民参保数据采集平台
+                </span>
+        </a>
+    </div>
+    <div class="navbar-collapse collapse" style="height: 1px;">
+    </div>
+</div>
+<div style="float:left; width:50%;margin-left:10%">
+    <img src="./img/login1.png" style="width:80%;height:650px;" />
+</div>
+<div class="dialog" style="float:left;width:25%;" id="divlog">
+    <div class="panel panel-default" style="background-color:rgb(109,147,170)">
+        <div style="font-size:25px;text-align:center;background-color:rgb(109,147,170); color:White; height:60px;line-height: 60px;">登录系统</div>
+        <div style="background-color:White; height:2px;"></div>
+        <div class="panel-body">
+            <div class="form-group">
+                <table style="margin-left:10%">
+                    <tr>
+                        <td><img style="width:30px;height:30px;" src="./img/user.png" /></td>
+                        <td style="width:20px"> </td>
+                        <td style="width:220px"><input id="username" name="username" type="text" class="form-control span12" style="background-color:rgb(153,180,197); color:White;height:30px" placeholder="输入用户名" /></td>
+                    </tr>
+                    <tr style="height:20px"></tr>
+                    <tr>
+                        <td><img style="width:30px;height:30px;" src="./img/pwd.png" /></td>
+                        <td style="width:20px"> </td>
+                        <td>  <input id="password" name="password" type="password" class="form-controlspan12 form-control" style="background-color:rgb(153,180,197); color:White;height:30px" placeholder="输入密码" /></td>
+                    </tr>
+                    <tr style="height:20px"></tr>
+                    <tr>
+                        <td><img style="width:30px;height:30px;" src="./img/yz.png" /></td>
+                        <td style="width:20px"> </td>
+                        <td><input id="verifyCode" name="verifyCode" type="text" class="form-control span12" maxlength="5" style="background-color:rgb(153,180,197); color:White; height:30px" placeholder="输入验证码" /></td>
+                    </tr>
+                    <tr>
+                        <td></td>
+                        <td style="width:2px"> </td>
+                        <td valign="bottom">
+                            <img id="valiCode" style="cursor: pointer;margin-top:20px;" src="./auth/verify/" alt="验证码" onclick="src = './auth/verify/?' + (new Date()).getTime();" />
+                        </td>
+                    </tr>
+                    <tr style="height:20px"></tr>
+                    <tr>
+                        <td></td>
+                        <td style="width:2px"> </td>
+                        <td>
+                            <input type="button" id="log" value="登录" onclick="btnLoadUserbak()" />
+                        </td>
+                    </tr>
+                    <tr style="height:20px"></tr>
+                </table>
+            </div>
+            <div class="form-group" style="height:20px">
+            </div>
+            <div class="clearfix">
+            </div>
+        </div>
+    </div>
+</div>
+<script>
+    function btnLoadUserbak() {
+        if (document.getElementById("UserName").value == "" || document.getElementById("Password").value == "") {
+            alert("用户名或密码不能为空");
+            return false;
+        }
+        if (document.getElementById("yzcode").value == "") {
+            alert("验证码不能为空");
+            return false;
+        }
+        if (document.cookie.length > 0) {
+            var c_name = "yzcode";
+            var c_start = document.cookie.indexOf(c_name + "=")
+            var cokkiestr = document.cookie.toString();
+            var yzcode = cokkiestr.split('=');
+            var yzmcode = yzcode[1].toString();
+            if (yzmcode.toUpperCase() != document.getElementById("yzcode").value.toUpperCase()) {
+                alert("验证码错误");
+                document.getElementById("yzcode").value = "";
+                document.getElementById("valiCode").src = '/Home/GetValidateCode?validateCode=' + (new Date()).getTime();
+                return false;
+            }
+        }
+        //var yzmcode = "12345";
+        var UserLoginName = document.getElementById("UserName").value;
+        var UserPassWord = document.getElementById("Password").value;
+        var b = new Base64();
+        UserPassWord = yzmcode + b.encode(UserPassWord);
+        UserLoginName = b.encode(UserLoginName) + yzmcode;
+            $.post("../Home/CheckUserInfo", { UserId: UserLoginName, UserPwd: UserPassWord, YZM: yzmcode  }, function (data) {
+            if (data=="ok") {
+                window.location.href = "../layui/index.html";
+            }
+            else {
+                document.getElementById("yzcode").value = "";
+                document.getElementById("valiCode").src = '/Home/GetValidateCode?validateCode=' + (new Date()).getTime();
+                alert("请检查账号密码是否正确!");
+            }
+        })
+    }
+
+    document.onkeydown = keyDownSearch;
+
+    function keyDownSearch(e) {
+        // 兼容FF和IE和Opera
+        var theEvent = e || window.event;
+        var code = theEvent.keyCode || theEvent.which || theEvent.charCode;
+        if (code == 13) {
+            btnLoadUserbak(); //具体处理函数
+            return false;
+        }
+        return true;
+    }
+</script>
+</body>
+</html>
