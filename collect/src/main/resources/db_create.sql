@@ -21,6 +21,18 @@ CREATE TABLE `auth_user` (
   UNIQUE KEY `user_name_unique` (`user_name`)
 ) ENGINE=INNODB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci COMMENT='用户认证所需身份信息';
 
+DROP TABLE IF EXISTS `client_user`;
+CREATE TABLE `client_user` (
+  `client_id` VARCHAR(225) COLLATE utf8mb4_unicode_ci NOT NULL COMMENT '客户端身份id',
+  `client_secret` VARCHAR(255) COLLATE utf8mb4_unicode_ci NOT NULL COMMENT '客户端身份秘钥',
+  `enabled` TINYINT(4) NOT NULL DEFAULT '1' COMMENT '用户是否可用',
+  `create_time` TIMESTAMP NULL DEFAULT CURRENT_TIMESTAMP COMMENT '创建时间',
+  `update_time` TIMESTAMP NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP COMMENT '更新时间',
+  `last_password_login_date` TIMESTAMP NULL DEFAULT NULL COMMENT '最后一颁发token时间(登陆时间)',
+  PRIMARY KEY (`client_id`),
+  UNIQUE KEY `mobile_no_unique` (`client_secret`)
+) ENGINE=INNODB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci COMMENT='客户端认证所需身份信息';
+
 DROP TABLE IF EXISTS `family_info`;
 CREATE TABLE `family_info` (
   `family_id` VARCHAR(225) COLLATE utf8mb4_unicode_ci NOT NULL COMMENT '户唯一标识',
